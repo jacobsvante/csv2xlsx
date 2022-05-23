@@ -1,5 +1,8 @@
-use std::{fs::File, io::{stdout, Write}};
 use csv2xlsx::{cli, csv2xlsx};
+use std::{
+    fs::File,
+    io::{stdout, Write},
+};
 
 fn main() -> anyhow::Result<()> {
     let opts = cli::parse();
@@ -8,6 +11,6 @@ fn main() -> anyhow::Result<()> {
         Some(opts.delimiter),
         opts.width_adjustment,
     )?;
-    stdout().write(&out)?;
+    stdout().write_all(&out)?;
     Ok(())
 }
