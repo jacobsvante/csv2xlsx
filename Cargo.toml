@@ -1,0 +1,16 @@
+[package]
+name = "csv2xlsx"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Convert CSV files to Excel (in XLSX format)"
+repository = "https://github.com/jacobsvante/csv2xlsx"
+documentation = "https://docs.rs/csv2xlsx/"
+homepage = "https://github.com/jacobsvante/csv2xlsx"
+
+[dependencies]
+anyhow = "1.0.57"
+clap = { version = "3.1.18", features = ["derive"] }
+csv = "1.1.6"
+simple_excel_writer = "0.2.0"
+unescape = "0.1.0"
