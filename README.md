@@ -6,15 +6,14 @@ Its main intended usage is through the provided CLI, but programmatic access sho
 
 ## CLI usage
 
-### Adjust to CSV
+### Simple convert with explicit filenames provided
 ```
-cat ~/example.csv | csv2xlsx
+csv2xlsx -i ~/example.csv -o ~/example.xlsx
 ```
-
 
 ### With column widths adjusted to their contents
 ```
-cat ~/example.csv | csv2xlsx --width-adjustment
+cat ~/example.csv | csv2xlsx --width-adjustment > ~/example.xlsx
 ```
 
 ### CLI help for more info
