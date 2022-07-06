@@ -23,7 +23,7 @@ pub fn csv2xlsx<I: Read>(
 
     let mut workbook = Workbook::create_in_memory();
 
-    let mut sheet = workbook.create_sheet("");
+    let mut sheet = workbook.create_sheet("default");
 
     let mut records = Vec::new();
     for result in reader.records() {
