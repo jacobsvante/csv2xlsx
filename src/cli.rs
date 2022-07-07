@@ -1,3 +1,4 @@
+use crate::constants::*;
 use clap::Parser;
 use std::path::PathBuf;
 
@@ -14,11 +15,14 @@ pub struct Opts {
     #[clap(short, long, parse(from_os_str), default_value = "/dev/stdout")]
     pub output_file: PathBuf,
     /// Delimiter used in the CSV file
-    #[clap(short, long, default_value = ",", parse(try_from_str = unescape_char))]
+    #[clap(short, long, default_value_t = DEFAULT_DELIMITER, parse(try_from_str = unescape_char))]
     pub delimiter: char,
     /// Automatically adjust widths for each column based on their content
     #[clap(short, long)]
     pub width_adjustment: bool,
+    /// Specify a custom sheet name
+    #[clap(short, long, default_value = DEFAULT_SHEET_NAME)]
+    pub sheet_name: String,
     #[clap(subcommand)]
     pub subcommand: Option<Subcommand>,
 }

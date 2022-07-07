@@ -4,18 +4,38 @@ use csv::StringRecord;
 use simple_excel_writer::{Column, Row, Sheet, Workbook};
 
 pub mod cli;
+mod constants;
+
+use constants::*;
+
+pub struct Options {
+    delimiter: char,
+    width_adjustment: bool,
+    sheet_name: String,
+}
+
+impl Options {
+    pub fn new(
+        delimiter: Option<char>,
+        width_adjustment: Option<bool>,
+        sheet_name: Option<String>,
+    ) -> Self {
+        Self {
+            delimiter: delimiter.unwrap_or(DEFAULT_DELIMITER),
+            width_adjustment: width_adjustment.unwrap_or(DEFAULT_WIDTH_ADJUSTMENT),
+            sheet_name: sheet_name.unwrap_or_else(|| DEFAULT_SHEET_NAME.to_string()),
+        }
+    }
+}
 
 fn parse_delimiter(d: char) -> anyhow::Result<u8> {
     u8::try_from(u32::from(d)).map_err(anyhow::Error::from)
 }
 
 /// Reads input as CSV and returns Excel data as bytes
-pub fn csv2xlsx<I: Read>(
-    input: I,
-    delimiter: Option<char>,
-    width_adjustment: bool,
-) -> anyhow::Result<Vec<u8>> {
-    let delimiter = parse_delimiter(delimiter.unwrap_or(','))?;
+pub fn csv2xlsx<I: Read>(input: I, options: Options) -> anyhow::Result<Vec<u8>> {
+    let delimiter = parse_delimiter(options.delimiter)?;
+
     let mut reader = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(false)
@@ -23,7 +43,7 @@ pub fn csv2xlsx<I: Read>(
 
     let mut workbook = Workbook::create_in_memory();
 
-    let mut sheet = workbook.create_sheet("default");
+    let mut sheet = workbook.create_sheet(&options.sheet_name);
 
     let mut records = Vec::new();
     for result in reader.records() {
@@ -31,7 +51,7 @@ pub fn csv2xlsx<I: Read>(
         records.push(record);
     }
 
-    if width_adjustment {
+    if options.width_adjustment {
         adjust_column_widths(&mut sheet, &records)?;
     }
 

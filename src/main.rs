@@ -1,6 +1,6 @@
 use csv2xlsx::{
     cli::{self, Subcommand},
-    csv2xlsx,
+    csv2xlsx, Options,
 };
 use std::{fs::File, io::Write};
 
@@ -16,8 +16,11 @@ fn main() -> anyhow::Result<()> {
     } else {
         let data = csv2xlsx(
             File::open(opts.input_file)?,
-            Some(opts.delimiter),
-            opts.width_adjustment,
+            Options::new(
+                Some(opts.delimiter),
+                Some(opts.width_adjustment),
+                Some(opts.sheet_name),
+            ),
         )?;
         let mut out = File::options()
             .write(true)
