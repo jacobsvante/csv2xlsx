@@ -1,6 +1,6 @@
 [package]
 name = "csv2xlsx"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 description = "Convert CSV files to Excel (in XLSX format)"
