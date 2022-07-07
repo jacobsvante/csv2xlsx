@@ -6,7 +6,7 @@ pub fn parse() -> Opts {
 }
 
 /// Convert CSV to Excel
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 pub struct Opts {
     #[clap(short, long, parse(from_os_str), default_value = "/dev/stdin")]
     pub input_file: PathBuf,
@@ -19,6 +19,13 @@ pub struct Opts {
     /// Automatically adjust widths for each column based on their content
     #[clap(short, long)]
     pub width_adjustment: bool,
+    #[clap(subcommand)]
+    pub subcommand: Option<Subcommand>,
+}
+
+#[derive(Debug, clap::Subcommand)]
+pub enum Subcommand {
+    Version,
 }
 
 fn unescape_chars(src: &str) -> anyhow::Result<String> {
