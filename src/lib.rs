@@ -59,7 +59,11 @@ pub fn csv2xlsx<I: Read>(input: I, options: Options) -> anyhow::Result<Vec<u8>> 
         for record in records {
             let mut row = Row::new();
             for value in record.into_iter() {
-                row.add_cell(value);
+                if let Ok(float) = value.parse::<f64>() {
+                    row.add_cell(float);
+                } else {
+                    row.add_cell(value);
+                }
             }
             sheet_writer.append_row(row)?;
         }
