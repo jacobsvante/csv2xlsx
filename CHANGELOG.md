@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.3.0](https://github.com/jacobsvante/csv2xlsx/compare/v0.2.0...v0.3.0) (2022-07-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* Library specific Error enum
+* Strip ANSI escapes
+* Support explicit cell type per column
+
+### Features
+
+* Library specific Error enum ([20c4c87](https://github.com/jacobsvante/csv2xlsx/commit/20c4c87440e0699b78610020fbdbd5cefecf514c))
+* Strip ANSI escapes ([9fa93cb](https://github.com/jacobsvante/csv2xlsx/commit/9fa93cbdd423d154ab8e57bfc986f91f89419e88))
+* Support explicit cell type per column ([cb2e5cb](https://github.com/jacobsvante/csv2xlsx/commit/cb2e5cbec465e491f7181c19b76a1fd74730b9eb)), closes [#5](https://github.com/jacobsvante/csv2xlsx/issues/5)
+
 ## [0.2.0](https://github.com/jacobsvante/csv2xlsx/compare/v0.1.1...v0.2.0) (2022-07-07)
 
 
