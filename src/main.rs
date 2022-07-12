@@ -16,11 +16,12 @@ fn main() -> anyhow::Result<()> {
     } else {
         let data = csv2xlsx(
             File::open(opts.input_file)?,
-            Options::new(
-                Some(opts.delimiter),
-                Some(opts.width_adjustment),
-                Some(opts.sheet_name),
-            ),
+            Options {
+                delimiter: opts.delimiter,
+                width_adjustment: opts.width_adjustment,
+                sheet_name: opts.sheet_name,
+                explicit_column_types_map: opts.explicit_column_types.into(),
+            },
         )?;
         let mut out = File::options()
             .write(true)

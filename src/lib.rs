@@ -1,32 +1,12 @@
-use std::io::Read;
-
 use csv::StringRecord;
 use simple_excel_writer::{Column, Row, Sheet, Workbook};
+use std::io::Read;
 
 pub mod cli;
 mod constants;
+mod options;
 
-use constants::*;
-
-pub struct Options {
-    delimiter: char,
-    width_adjustment: bool,
-    sheet_name: String,
-}
-
-impl Options {
-    pub fn new(
-        delimiter: Option<char>,
-        width_adjustment: Option<bool>,
-        sheet_name: Option<String>,
-    ) -> Self {
-        Self {
-            delimiter: delimiter.unwrap_or(DEFAULT_DELIMITER),
-            width_adjustment: width_adjustment.unwrap_or(DEFAULT_WIDTH_ADJUSTMENT),
-            sheet_name: sheet_name.unwrap_or_else(|| DEFAULT_SHEET_NAME.to_string()),
-        }
-    }
-}
+pub use options::*;
 
 fn parse_delimiter(d: char) -> anyhow::Result<u8> {
     u8::try_from(u32::from(d)).map_err(anyhow::Error::from)
@@ -56,10 +36,17 @@ pub fn csv2xlsx<I: Read>(input: I, options: Options) -> anyhow::Result<Vec<u8>> 
     }
 
     workbook.write_sheet(&mut sheet, |sheet_writer| {
-        for record in records {
+        for record in records.iter() {
             let mut row = Row::new();
-            for value in record.into_iter() {
-                row.add_cell(value);
+            for (col_idx, value) in record.into_iter().enumerate() {
+                if let Ok(cell_value) = options
+                    .explicit_column_types_map
+                    .to_cell_value(col_idx as u16, value)
+                {
+                    row.add_cell(cell_value);
+                } else {
+                    row.add_cell(value);
+                }
             }
             sheet_writer.append_row(row)?;
         }

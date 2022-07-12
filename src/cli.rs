@@ -1,4 +1,4 @@
-use crate::constants::*;
+use crate::{constants::*, options::ExplicitColumnType};
 use clap::Parser;
 use std::path::PathBuf;
 
@@ -23,6 +23,9 @@ pub struct Opts {
     /// Specify a custom sheet name
     #[clap(short, long, default_value = DEFAULT_SHEET_NAME)]
     pub sheet_name: String,
+    /// Specify explicit column types (0-index to type, which must be one that implements Type)
+    #[clap(short, long)]
+    pub explicit_column_types: Vec<ExplicitColumnType>,
     #[clap(subcommand)]
     pub subcommand: Option<Subcommand>,
 }
