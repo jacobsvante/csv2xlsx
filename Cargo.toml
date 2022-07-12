@@ -13,4 +13,5 @@ anyhow = "1.0.57"
 clap = { version = "3.1.18", features = ["derive"] }
 csv = "1.1.6"
 simple_excel_writer = "0.2.0"
+strip-ansi-escapes = "0.1.1"
 unescape = "0.1.0"

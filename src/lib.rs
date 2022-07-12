@@ -39,9 +39,11 @@ pub fn csv2xlsx<I: Read>(input: I, options: Options) -> anyhow::Result<Vec<u8>> 
         for record in records.iter() {
             let mut row = Row::new();
             for (col_idx, value) in record.into_iter().enumerate() {
+                let value = String::from_utf8(strip_ansi_escapes::strip(value)?)
+                    .expect("stripping ANSI escapes from a UTF-8 string always results in UTF-8");
                 if let Ok(cell_value) = options
                     .explicit_column_types_map
-                    .to_cell_value(col_idx as u16, value)
+                    .to_cell_value(col_idx as u16, &value)
                 {
                     row.add_cell(cell_value);
                 } else {
