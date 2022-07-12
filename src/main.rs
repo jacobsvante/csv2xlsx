@@ -4,7 +4,7 @@ use csv2xlsx::{
 };
 use std::{fs::File, io::Write};
 
-fn main() -> anyhow::Result<()> {
+fn main() -> csv2xlsx::Result<()> {
     let opts = cli::parse();
     if let Some(subcmd) = opts.subcommand {
         match subcmd {

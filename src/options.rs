@@ -1,9 +1,8 @@
 use std::{collections::HashMap, str::FromStr};
 
-use anyhow::bail;
 use simple_excel_writer::{CellValue, ToCellValue};
 
-use crate::constants;
+use crate::{constants, Error, Result};
 
 #[derive(Default)]
 pub struct Options {
@@ -55,14 +54,14 @@ pub(crate) enum ExplicitCellType {
 }
 
 impl FromStr for ExplicitCellType {
-    type Err = anyhow::Error;
+    type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self> {
         match s.to_ascii_lowercase().as_str() {
             "bool" => Ok(Self::Bool),
             "number" => Ok(Self::Number),
             "string" => Ok(Self::String),
-            _ => bail!("Unsupported type"),
+            _ => Err(Error::UnparsableExplicitCellType),
         }
     }
 }
@@ -71,17 +70,17 @@ impl FromStr for ExplicitCellType {
 pub struct ExplicitColumnType(u16, ExplicitCellType);
 
 impl FromStr for ExplicitColumnType {
-    type Err = anyhow::Error;
+    type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self> {
         match s.split_once('=') {
             Some((idx, cell_type)) => {
-                let idx: u16 = idx.parse()?;
+                let idx: u16 = idx
+                    .parse()
+                    .map_err(|_| Error::UnparsableExplicitColumnType)?;
                 Ok(Self(idx, ExplicitCellType::from_str(cell_type)?))
             }
-            None => {
-                bail!("Must be in format <column_index>=<cell_type>")
-            }
+            None => Err(Error::UnparsableExplicitColumnType),
         }
     }
 }
@@ -104,19 +103,21 @@ impl ExplicitColumnTypesMap {
         self.0.get(&column_index).map(|ect| ect.1)
     }
 
-    pub(crate) fn to_cell_value(
-        &self,
-        column_index: u16,
-        value: &str,
-    ) -> anyhow::Result<CellValue> {
+    pub(crate) fn to_cell_value(&self, column_index: u16, value: &str) -> Result<CellValue> {
         if let Some(ect) = self.get(column_index) {
             Ok(match ect {
-                ExplicitCellType::Number => value.parse::<f64>()?.to_cell_value(),
-                ExplicitCellType::Bool => value.parse::<bool>()?.to_cell_value(),
+                ExplicitCellType::Number => value
+                    .parse::<f64>()
+                    .map_err(|_| Error::UnparsableNumber)?
+                    .to_cell_value(),
+                ExplicitCellType::Bool => value
+                    .parse::<bool>()
+                    .map_err(|_| Error::UnparsableBool)?
+                    .to_cell_value(),
                 ExplicitCellType::String => value.to_cell_value(),
             })
         } else {
-            anyhow::bail!("No explicit type found for this column")
+            Err(Error::UnmatchedExplicitColumnTypeIndex)
         }
     }
 }

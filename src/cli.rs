@@ -1,4 +1,5 @@
 use crate::{constants::*, options::ExplicitColumnType};
+use crate::{Error, Result};
 use clap::Parser;
 use std::path::PathBuf;
 
@@ -15,7 +16,7 @@ pub struct Opts {
     #[clap(short, long, parse(from_os_str), default_value = "/dev/stdout")]
     pub output_file: PathBuf,
     /// Delimiter used in the CSV file
-    #[clap(short, long, default_value_t = DEFAULT_DELIMITER, parse(try_from_str = unescape_char))]
+    #[clap(short, long, default_value_t = DEFAULT_DELIMITER, parse(try_from_str = unescape_delimiter))]
     pub delimiter: char,
     /// Automatically adjust widths for each column based on their content
     #[clap(short, long)]
@@ -35,18 +36,15 @@ pub enum Subcommand {
     Version,
 }
 
-fn unescape_chars(src: &str) -> anyhow::Result<String> {
-    let collected: String = unescape::unescape(src)
-        .ok_or_else(|| anyhow::anyhow!("Failed to unescape delimiter"))?
-        .chars()
-        .collect();
-    Ok(collected)
-}
-
-fn unescape_char(src: &str) -> anyhow::Result<char> {
-    let chars: Vec<char> = unescape_chars(src)?.chars().collect();
-    match &chars[..] {
-        [c] => Ok(c.to_owned()),
-        vec => anyhow::bail!("Needs to be exactly 1 character, not {}", vec.len()),
+fn unescape_delimiter(src: &str) -> Result<char> {
+    if src.len() == 1 {
+        let c: char = unescape::unescape(src)
+            .ok_or(Error::InvalidDelimiter)?
+            .chars()
+            .next()
+            .unwrap();
+        Ok(c)
+    } else {
+        Err(Error::InvalidDelimiter)
     }
 }

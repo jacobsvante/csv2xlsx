@@ -4,16 +4,18 @@ use std::io::Read;
 
 pub mod cli;
 mod constants;
+mod errors;
 mod options;
 
+pub use errors::*;
 pub use options::*;
 
-fn parse_delimiter(d: char) -> anyhow::Result<u8> {
-    u8::try_from(u32::from(d)).map_err(anyhow::Error::from)
+fn parse_delimiter(d: char) -> Result<u8> {
+    u8::try_from(u32::from(d)).map_err(|_| Error::InvalidDelimiter)
 }
 
 /// Reads input as CSV and returns Excel data as bytes
-pub fn csv2xlsx<I: Read>(input: I, options: Options) -> anyhow::Result<Vec<u8>> {
+pub fn csv2xlsx<I: Read>(input: I, options: Options) -> Result<Vec<u8>> {
     let delimiter = parse_delimiter(options.delimiter)?;
 
     let mut reader = csv::ReaderBuilder::new()
@@ -59,7 +61,7 @@ pub fn csv2xlsx<I: Read>(input: I, options: Options) -> anyhow::Result<Vec<u8>> 
     Ok(output)
 }
 
-fn adjust_column_widths(sheet: &mut Sheet, records: &Vec<StringRecord>) -> anyhow::Result<()> {
+fn adjust_column_widths(sheet: &mut Sheet, records: &Vec<StringRecord>) -> Result<()> {
     if records.is_empty() {
         return Ok(());
     }
